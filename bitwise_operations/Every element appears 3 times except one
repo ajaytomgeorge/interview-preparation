@@ -1,0 +1,23 @@
+Example:
+
+nums = [2,2,2,3]
+
+
+Solution (Bit counting):
+
+result = 0
+for i in range(32):  # for each bit
+    bit_sum = 0
+    for n in nums:
+        bit_sum += (n >> i) & 1
+    result |= (bit_sum % 3) << i
+return result
+
+
+Explanation:
+
+Count 1s in each bit position across all numbers
+
+Mod 3 → bits of the number appearing once remain
+
+Reconstruct the number from bits

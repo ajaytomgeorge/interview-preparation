@@ -1,0 +1,128 @@
+4️⃣ Minimum Number of Platforms (Train Problem)
+
+Problem
+Given arrival and departure times, find the minimum platforms needed so no train waits.
+
+Greedy idea
+
+Sort arrivals and departures
+
+Use two pointers
+
+Example
+
+Arrivals:   900, 940, 950, 1100
+Departures: 910, 1200, 1120, 1130
+
+Answer: 3 platforms
+
+
+
+Perfect! Let’s solve Minimum Number of Platforms step by step in an exam-ready style, with explanation, intuition, and Python code.
+
+✅ Minimum Number of Platforms Problem
+📌 Problem Statement
+
+You are given:
+
+Arrival times of trains: arr[i]
+
+Departure times of trains: dep[i]
+
+Goal: Find the minimum number of platforms required so that no train has to wait.
+
+Constraints:
+
+Trains cannot be delayed
+
+Arrival and departure times are in 24-hour format
+
+Example
+Arrivals:   900, 940, 950, 1100
+Departures: 910, 1200, 1120, 1130
+
+
+Answer: 3 platforms
+
+🧠 Greedy Insight
+
+The problem is about overlapping intervals
+
+Sort arrivals and departures
+
+Use two pointers:
+
+Pointer i → arrival array
+
+Pointer j → departure array
+
+Algorithm Idea:
+
+If next train arrives before the earliest departure, we need extra platform
+
+If train departs before next arrival, a platform frees up
+
+Key: This is a classic greedy approach: always check earliest next event (arrival or departure).
+
+🔁 Step-by-Step Example
+Arrivals:   900, 940, 950, 1100
+Departures: 910, 1120, 1130, 1200
+
+
+Sort both arrays:
+
+arr = [900, 940, 950, 1100]
+dep = [910, 1120, 1130, 1200]
+
+Step	arr[i]	dep[j]	Platforms	Max Platforms
+0	900	910	1	1
+1	940	910	2	2
+2	950	1120	3	3
+3	1100	1120	3	3
+
+✅ Max platforms needed = 3
+
+🧑‍💻 Python Code (Exam Ready)
+def min_platforms(arr, dep):
+    n = len(arr)
+    
+    # Sort arrival and departure times
+    arr.sort()
+    dep.sort()
+    
+    i = j = 0
+    platforms = 0
+    max_platforms = 0
+    
+    while i < n and j < n:
+        if arr[i] <= dep[j]:
+            # Next train arrives before previous departs → need a platform
+            platforms += 1
+            max_platforms = max(max_platforms, platforms)
+            i += 1
+        else:
+            # A train departs → free a platform
+            platforms -= 1
+            j += 1
+    
+    return max_platforms
+
+🧪 Test
+arr = [900, 940, 950, 1100]
+dep = [910, 1120, 1130, 1200]
+
+print(min_platforms(arr, dep))  # Output: 3
+
+⏱ Complexity
+Metric	Value
+Time	O(n log n) (sorting)
+Space	O(1)
+✅ Greedy Reasoning
+
+Sort both arrivals and departures
+
+At every step, check next event (arrival or departure) → local decision
+
+Locally optimal choice (increase/decrease platform) → leads to global optimum
+
+The algorithm satisfies greedy-choice property: handling the earliest event always leads to minimum platforms globally.

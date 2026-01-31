@@ -1,0 +1,156 @@
+
+3️⃣ Subarray vs Subset Problems(e.g of choices to taje)
+
+Subarray:
+
+Must be contiguous elements → sliding window works
+
+No choices → deterministic
+
+Subset (group of numbers, not contiguous):
+
+Pick any combination to maximize sum ≤ k
+
+Choices must be made → can use greedy heuristics or dynamic programming
+
+Example: 0/1 Knapsack, subset-sum problems
+
+Key Table:
+
+Feature	Sliding Window (Subarray)	Subset (Non-contiguous)
+Contiguous	Yes	No
+Choices	No	Yes
+Algorithm type	Sliding Window	Greedy / DP / Backtracking
+Time complexity	O(n)	O(n*k) with DP, exponential brute force for naive
+Intuition	Window moves deterministically	Must choose elements carefully
+
+
+Exam Notes: Subarray, Sliding Window, and Greedy Problems
+1️⃣ Maximum Sum Subarray of Fixed Size k (Sliding Window)
+
+Problem:
+
+Input: Array of integers arr and integer k
+
+Task: Find the maximum sum of any contiguous subarray of size k
+
+Solution (Python):
+
+def max_sum_subarray(arr, k):
+    window_sum = sum(arr[:k])
+    max_sum = window_sum
+
+    for i in range(k, len(arr)):
+        window_sum += arr[i] - arr[i - k]
+        max_sum = max(max_sum, window_sum)
+    return max_sum
+
+print(max_sum_subarray([2,1,5,1,3,2], 3))  # Output: 9 ([5,1,3])
+
+
+How it works:
+
+Compute sum of first k elements → window_sum
+
+Slide window one element at a time:
+
+window_sum = window_sum + arr[i] - arr[i-k]
+
+
+Update max_sum after each slide
+
+Key Points:
+
+Type: Sliding Window
+
+Time Complexity: O(n)
+
+Space Complexity: O(1)
+
+Greedy? ❌ No — no choices are made; deterministic and exact
+
+Why not greedy: Greedy algorithms make locally optimal choices hoping for a global optimum; here, all windows are systematically checked
+
+Sliding Window vs Greedy Intuition
+Feature	Sliding Window	Greedy
+Choice-making	No	Yes (pick best option at each step)
+Guarantee	Exact result	May or may not be globally optimal
+Example	Max sum subarray	Activity selection, coin change
+2️⃣ Activity Selection (Interval Scheduling)
+
+Problem:
+
+Input: Set of activities with start & end times
+
+Task: Select maximum number of non-overlapping activities
+
+Greedy Choice:
+
+Pick the activity that finishes earliest
+
+Reason: Leaving room for more future activities
+
+Example:
+
+Activities = [(1,3), (2,4), (3,5), (0,6), (5,7)]
+Greedy solution: (1,3) → (3,5) → (5,7)
+
+
+Algorithm:
+
+Sort activities by end time
+
+Pick the earliest finishing activity that doesn’t overlap
+
+Repeat until all activities are considered
+
+Key Points:
+
+Type: Greedy algorithm
+
+Choice-making: Yes — you actively select activities
+
+Guarantee: Proven to be globally optimal due to greedy property
+
+Time Complexity: O(n log n) (sorting)
+
+Sliding Window vs Activity Selection
+Feature	Max Sum Subarray	Activity Selection
+Problem type	Continuous sum	Interval selection
+Algorithm type	Sliding Window	Greedy
+Choices	No	Yes
+Guarantee	Exact	Exact (proof via greedy choice)
+Key idea	Slide and sum	Pick earliest finish to maximize future options
+3️⃣ Subarray vs Subset Problems
+
+Subarray:
+
+Must be contiguous elements → sliding window works
+
+No choices → deterministic
+
+Subset (group of numbers, not contiguous):
+
+Pick any combination to maximize sum ≤ k
+
+Choices must be made → can use greedy heuristics or dynamic programming
+
+Example: 0/1 Knapsack, subset-sum problems
+
+Key Table:
+
+Feature	Sliding Window (Subarray)	Subset (Non-contiguous)
+Contiguous	Yes	No
+Choices	No	Yes
+Algorithm type	Sliding Window	Greedy / DP / Backtracking
+Time complexity	O(n)	O(n*k) with DP, exponential brute force for naive
+Intuition	Window moves deterministically	Must choose elements carefully
+Takeaways
+
+Sliding window: Used for fixed or variable contiguous subarray problems — exact solution, no choices
+
+Greedy problems: You actively make a choice at each step to optimize globally
+
+Subset problems / Knapsack: Choices + constraints → may need greedy heuristics or DP
+
+Activity Selection: Classic greedy example → earliest finish choice guarantees optimal solution

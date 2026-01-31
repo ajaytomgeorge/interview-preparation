@@ -1,0 +1,116 @@
+Option 1: The "Return-to-Source" Logic
+This approach modifies Dijkstra's initialization so the algorithm is forced to find a path that travels away and comes back to the starting node.
+
+import heapq
+
+def getMinCycle_ReturnToSource(road_nodes, roads_from, roads_to, roads_weight):
+    adj = [[] for _ in range(road_nodes + 1)]
+    for u, v, w in zip(roads_from, roads_to, roads_weight):
+        adj[u].append((v, w))
+    
+    results = []
+    for start_node in range(1, road_nodes + 1):
+        min_cycle = float('inf')
+        pq = []
+        # Step 1: Initialize distances as infinity
+        dist = [float('inf')] * (road_nodes + 1)
+        
+        # Step 2: Instead of dist[start]=0, start from neighbors
+        for neighbor, weight in adj[start_node]:
+            if weight < dist[neighbor]:
+                dist[neighbor] = weight
+                heapq.heappush(pq, (weight, neighbor))
+        
+        while pq:
+            d, u = heapq.heappop(pq)
+            if u == start_node: # We found a path back!
+                min_cycle = d
+                break
+            if d > dist[u]: continue
+            for v, weight in adj[u]:
+                if d + weight < dist[v]:
+                    dist[v] = d + weight
+                    heapq.heappush(pq, (dist[v], v))
+        
+        results.append(min_cycle if min_cycle != float('inf') else 0)
+    return results
+
+
+    Option 2: The "Path-to-Predecessor" Logic (From Image)
+This is the logic shown in your provided code. It runs a standard Dijkstra and then "closes the loop" manually using a list of incoming edges.
+Solution 1: The "Predecessor" Approach (From your Image)
+This version uses a standard Dijkstra and an Eager mindset by tracking distances in an array initialized with infinity.
+
+How it works:
+
+Build two maps: An adjacency list for outgoing roads and a separate map for incoming roads to each node.
+
+Standard Dijkstra: For each start node, run a full Dijkstra to find the shortest distance from start to all other nodes y.
+
+Close the Loop: Look at all nodes y that have a direct road back to start.
+
+Calculate: The cycle length is dist[y] + weight(y -> start).
+Python
+import heapq
+from collections import defaultdict
+
+def getMinimumLength(road_nodes, roads_from, roads_to, roads_weight):
+    graph = defaultdict(list)
+    incoming = defaultdict(list)
+    for u, v, w in zip(roads_from, roads_to, roads_weight):
+        graph[u].append((v, w))
+        incoming[v].append((u, w))
+    
+    result = []
+    for start in range(1, road_nodes + 1):
+        # Eager Dijkstra with Infinity initialization
+        dist = [float("inf")] * (road_nodes + 1)
+        dist[start] = 0
+        pq = [(0, start)]
+        
+        while pq:
+            curr_dist, u = heapq.heappop(pq)
+            if curr_dist > dist[u]: continue
+            for v, w in graph[u]:
+                if curr_dist + w < dist[v]:
+                    dist[v] = curr_dist + w
+                    heapq.heappush(pq, (dist[v], v))
+        
+        best = float("inf")
+        # Find the neighbor that points back to start
+        for y, w in incoming[start]:
+            if dist[y] < float("inf") and (y != start or w > 0): # only first ocniditon is needed, explanation is downside
+                best = min(best, dist[y] + w)
+        result.append(best if best < float("inf") else 0)
+    return result
+
+
+     even if we remove (y != start or w > 0):, it will worjk the same
+
+You are actually correct—in the specific context of this problem and the way the dijkstra function is written, the code would likely still work without that specific check.
+
+However, programmers often include it as a "safety guard" to prevent a specific mathematical trap. Here is why it works the same in this problem, but why the logic is there anyway.
+
+Why it works the same
+In your code, dist[start] is 0. If you have a self-loop from node 1 to node 1 with weight w=10:
+
+y will be 1.
+
+w will be 10.
+
+dist[y] is 0.
+
+The calculation is 0+10=10.
+
+This correctly identifies 10 as the shortest cycle.
+
+The only way the code would "break" without that check is if there was a road with weight 0 or if the algorithm somehow considered "staying at the start" to be a valid cycle. Since roads in this problem generally have positive weights, the math 0 + w always results in the correct self-loop weight.
+
+The "Hidden Trap" it Prevents
+The reason developers often include (y != start) is to handle Undirected Graphs or Zero-Weight Edges.
+
+Zero-Weight Edges: If a road had a weight of 0, then dist[start] + 0 would equal 0. The algorithm would report that the shortest cycle is 0. Usually, a "cycle" must consist of actual movement.
+
+Back-and-Forth "Cycles" (Undirected): In an undirected graph, if there is a road between 1 and 2, you can go 1→2 and immediately 2→1. Some problem setters don't consider this a "cycle" (they want a loop of at least 3 nodes). This check is a starting point for filtering those out.
+
+Clarity: It explicitly tells anyone reading the code: "We are looking for a path to a predecessor, OR a direct self-loop."

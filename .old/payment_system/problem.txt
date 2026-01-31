@@ -1,0 +1,7 @@
+We’ll simulate a tiny payment system that:
+
+Calculates a transaction fee,
+
+Applies it to a payment amount, and
+
+Stores the payment in a mock “database.”

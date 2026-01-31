@@ -1,0 +1,34 @@
+import threading
+import time
+import random
+
+buffer = []
+MAX_SIZE = 5
+
+mutex = threading.Lock()
+empty = threading.Semaphore(MAX_SIZE)
+full = threading.Semaphore(0)
+
+def producer():
+    while True:
+        item = random.randint(1, 100)
+        empty.acquire()
+        with mutex:
+            buffer.append(item)
+            print(f"Produced {item}")
+        full.release()
+        time.sleep(1)
+
+def consumer():
+    while True:
+        full.acquire()
+        with mutex:
+            item = buffer.pop(0)
+            print(f"Consumed {item}")
+        empty.release()
+        time.sleep(2)
+
+threading.Thread(target=producer, daemon=True).start()
+threading.Thread(target=consumer, daemon=True).start()
+
+time.sleep(10)

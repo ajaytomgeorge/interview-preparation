@@ -1,0 +1,214 @@
+6️⃣ Job Sequencing with Deadlines
+
+Problem
+Each job has a deadline and profit. Do jobs to maximize profit (1 job per unit time).
+
+Greedy choice
+
+Sort jobs by profit (descending)
+
+Schedule each job as late as possible before its deadline
+
+Example
+
+Jobs: (profit, deadline)
+A (100, 2)
+B (19, 1)
+C (27, 2)
+D (25, 1)
+
+Optimal profit = 127
+
+Exolanation
+No worries — this problem is confusing the first time you see it.
+Let’s explain it very slowly, with intuition and a real-life analogy.
+
+🧠 Job Sequencing with Deadlines — Plain English
+
+You are given jobs.
+Each job:
+
+Takes exactly 1 unit of time
+
+Must be done before a deadline
+
+Gives you some profit
+
+👉 You can do only ONE job at a time
+👉 Your goal is to earn maximum total profit
+
+🏭 Real-Life Analogy
+
+Imagine you run a small workshop:
+
+You can do only one job per day
+
+Each job:
+
+Must be finished before a certain day
+
+Pays you some money
+
+💡 You want to choose which jobs to do and when to earn maximum money.
+
+📌 Example
+Job	Deadline	Profit
+A	2	100
+B	1	19
+C	2	27
+D	1	25
+E	3	15
+What does this mean?
+
+Job A must be done by day 2
+
+Job B must be done by day 1
+
+Job E must be done by day 3
+
+Each job takes 1 day
+
+🗓 Time Slots Visualization
+
+Maximum deadline = 3
+
+So we have 3 time slots:
+
+Day 1 | Day 2 | Day 3
+
+
+We can place only one job per day.
+
+❌ Why Can’t We Do All Jobs?
+
+There are 5 jobs but only 3 days → impossible to do all.
+
+So we must choose wisely.
+
+🧠 Greedy Idea (Core Insight)
+1️⃣ Pick jobs with highest profit first
+2️⃣ Do them as late as possible before their deadline
+
+Why late?
+👉 To keep earlier days free for other jobs.
+
+✅ Step-by-Step Scheduling
+Step 1: Sort by profit (descending)
+A(100), C(27), D(25), B(19), E(15)
+
+Step 2: Try to place each job
+Job A (deadline = 2)
+
+Place it on Day 2
+
+Day 1 | Day 2 | Day 3
+  -   |   A   |   -
+
+Job C (deadline = 2)
+
+Day 2 is full → try Day 1
+
+Day 1 | Day 2 | Day 3
+  C   |   A   |   -
+
+Job D (deadline = 1)
+
+Day 1 is full → ❌ skip
+
+Job B (deadline = 1)
+
+Day 1 is full → ❌ skip
+
+Job E (deadline = 3)
+
+Place on Day 3
+
+Day 1 | Day 2 | Day 3
+  C   |   A   |   E
+
+🏆 Final Result
+
+Jobs done: C, A, E
+
+Total profit = 27 + 100 + 15 = 142
+
+✅ Why Greedy Works Here
+
+High-profit jobs are more important
+
+Scheduling late avoids blocking other jobs
+
+Local optimal decisions lead to global optimal profit
+
+📌 One-Line Exam Explanation
+
+Job Sequencing with Deadlines schedules jobs by sorting them in descending profit order and placing each job in the latest available slot before its deadline to maximize total profit.
+
+🧠 Key Takeaway
+Concept	Meaning
+1 job per unit time	Can’t do two jobs on same day
+Deadline	Last day job can be done
+Profit	Money earned
+Goal	Maximize profit
+Strategy	Greedy
+
+If you want next, I can:
+
+Explain why “schedule late” is important
+
+Show wrong greedy strategy & counterexample
+
+Draw exam-style diagrams
+
+Compare with DP approach
+
+Just tell me 🙂
+
+
+🧑‍💻 Python Implementation
+def job_sequencing(jobs):
+    """
+    jobs: list of tuples (job_id, deadline, profit)
+    returns: total profit and scheduled jobs
+    """
+
+    # Sort jobs by profit (descending)
+    jobs.sort(key=lambda x: x[2], reverse=True)
+
+    # Find maximum deadline
+    max_deadline = max(job[1] for job in jobs)
+
+    # Create slots (None means free)
+    slots = [None] * max_deadline
+    total_profit = 0
+
+    for job_id, deadline, profit in jobs:
+        # Try to place job as late as possible
+        for i in range(deadline - 1, -1, -1):
+            if slots[i] is None:
+                slots[i] = job_id
+                total_profit += profit
+                break
+
+    return total_profit, slots
+
+📌 Example Usage
+jobs = [
+    ('A', 2, 100),
+    ('B', 1, 19),
+    ('C', 2, 27),
+    ('D', 1, 25),
+    ('E', 3, 15)
+]
+
+profit, schedule = job_sequencing(jobs)
+print("Total Profit:", profit)
+print("Schedule:", schedule)
+
+Output
+Total Profit: 142
+Schedule: ['C', 'A', 'E']
+
+🧠 Memory Trick for Exams
+
+Profit first → Place late → Max profit

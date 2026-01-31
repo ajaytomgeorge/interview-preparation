@@ -1,0 +1,55 @@
+The Singleton Pattern is a design pattern that ensures a class has only one instance and provides a global point of access to it. It’s commonly used for things like database connection pools, logging, or configuration settings.
+
+In Python, there are several ways to implement this, ranging from "Pythonic" to "Strict."
+
+1. The "Pythonic" Way (Module-level)
+In Python, modules are singletons by default. When you import a module, Python executes it once and caches it. Any other file that imports it gets the exact same object.
+
+Python
+# settings.py
+class Settings:
+    def __init__(self):
+        self.theme = "Dark"
+
+# We instantiate it right here in the module
+app_settings = Settings()
+Python
+# main.py
+from settings import app_settings
+print(app_settings.theme) # "Dark"
+Why use this? It's simple, thread-safe, and requires no "magic" code.
+
+2. The Classic Way (Overriding __new__)
+If you want to ensure that calling Settings() always returns the same instance, you override the __new__ method. This is the method that actually creates the object before __init__ initializes it.
+
+Python
+class Singleton:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            print("Creating new instance...")
+            cls._instance = super(Singleton, cls).__new__(cls)
+        return cls._instance
+
+# Testing it out
+s1 = Singleton()
+s2 = Singleton()
+
+print(s1 is s2)  # True (They are the exact same object in memory)
+3. The Thread-Safe Singleton
+The example above has a "race condition." If two threads try to create the instance at the exact same millisecond, you might accidentally end up with two instances. In a production environment, you should use a Lock.
+
+Python
+import threading
+
+class ThreadSafeSingleton:
+    _instance = None
+    _lock = threading.Lock()
+
+    def __new__(cls):
+        with cls._lock: # Only one thread can enter this block at a time
+            if cls._instance is None:
+                cls._instance = super(ThreadSafeSingleton, cls).__new__(cls)
+        return cls._instance
+Pros and Cons

@@ -1,0 +1,191 @@
+5️⃣ Huffman Coding
+
+Problem
+Compress data by assigning shorter codes to frequent characters.
+
+Greedy choice
+Always merge the two least frequent nodes.
+
+Example
+
+Characters: a(5), b(9), c(12), d(13), e(16), f(45)
+
+
+Why greedy works
+Local optimal merges lead to globally optimal prefix codes.
+
+📌 Very strong theory + implementation interview question.
+
+
+
+
+📌 Exam Notes: Huffman Coding & Prefix-Free
+1️⃣ Prefix-Free Codes
+
+Definition:
+
+A set of codes where no code is a prefix of any other code.
+
+Why Important:
+
+Ensures unambiguous decoding
+
+Can read bitstream sequentially without confusion
+
+Example:
+
+Prefix-free ✅
+a = 0
+b = 10
+c = 11
+
+Not prefix-free ❌
+a = 0
+b = 01
+
+
+Reading 01 → ambiguous in non-prefix-free codes
+
+2️⃣ Huffman Encoding
+
+Goal: Compress data → shorter codes for frequent characters
+
+Greedy Choice: Merge two smallest frequency nodes repeatedly → build binary tree
+
+Properties:
+
+Prefix-free
+
+Minimizes total cost = sum(freq × code length)
+
+Steps:
+
+Build min-heap with character frequencies
+
+Merge two smallest nodes → push back
+
+Repeat until one node → root of Huffman tree
+
+Traverse tree → left=0, right=1 → assign codes
+
+Complexity: O(n log n)
+
+3️⃣ Comparison: Random/Arbitrary Codes vs Huffman
+Aspect	Arbitrary (Random) Codes	Huffman Codes
+Prefix-free	❌ May fail	✅ Always
+Shorter codes for frequent	Sometimes	✅ Guaranteed
+Total cost (weighted)	❌ May be higher	✅ Minimal
+Decoding unambiguous	❌ May fail	✅ Always
+Construction method	Arbitrary	Merge two smallest frequencies
+
+Key Takeaway:
+
+Huffman is guaranteed optimal and safe.
+
+Random assignment may violate prefix-free or cost more.
+
+4️⃣ Python Solution: Huffman Encoding
+import heapq
+
+class Node:
+    def __init__(self, freq, char=None):
+        self.freq = freq
+        self.char = char
+        self.left = None
+        self.right = None
+    def __lt__(self, other):
+        return self.freq < other.freq
+
+def huffman_encoding(char_freq):
+    heap = [Node(freq, char) for char, freq in char_freq.items()]
+    heapq.heapify(heap)
+    
+    while len(heap) > 1:
+        node1 = heapq.heappop(heap)
+        node2 = heapq.heappop(heap)
+        merged = Node(node1.freq + node2.freq)
+        merged.left = node1
+        merged.right = node2
+        heapq.heappush(heap, merged)
+    
+    return heap[0]
+
+def generate_codes(node, prefix="", code_map={}):
+    if node is None:
+        return
+    if node.char:
+        code_map[node.char] = prefix
+    generate_codes(node.left, prefix + "0", code_map)
+    generate_codes(node.right, prefix + "1", code_map)
+    return code_map
+
+# Example
+char_freq = {'a':5, 'b':9, 'c':12, 'd':13, 'e':16, 'f':45}
+root = huffman_encoding(char_freq)
+codes = generate_codes(root)
+print("Huffman Codes:", codes)
+
+5️⃣ Python Solution: Arbitrary Frequency-Based Codes
+# Just assign short codes to high frequency arbitrarily
+def random_encoding(char_freq):
+    sorted_chars = sorted(char_freq.items(), key=lambda x: -x[1])
+    codes = {}
+    code = 0
+    for char, _ in sorted_chars:
+        codes[char] = bin(code)[2:]  # convert int to binary string
+        code += 1
+    return codes
+
+codes_random = random_encoding(char_freq)
+print("Random Codes:", codes_random)
+
+
+Note:
+
+random_encoding may not be prefix-free
+
+Not guaranteed to minimize total cost
+
+6️⃣ Quick Notes for Exam
+
+Prefix-free → No code is prefix of another → ensures correct decoding
+
+Huffman → Optimal compression → shortest codes for frequent characters, prefix-free by construction
+
+Arbitrary assignment → simple, may fail prefix-free or increase total cost
+
+Python → Huffman uses min-heap + tree traversal, Random uses sorted frequencies
+
+
+
+Prefix-Free Codes Example
+a = 0
+b = 10
+c = 11
+
+
+Suppose we have an encoded message:
+
+Encoded stream: 0110
+
+Step-by-Step Decoding (Left to Right)
+
+Start reading first bit → 0
+
+Matches a = 0 → ✅ decoded a
+
+Move to next bit
+
+Next bit → 1
+
+Look at next 2 bits → 10
+
+Matches b = 10 → ✅ decoded b
+
+Move past these 2 bits
+
+Remaining bit → 1
+
+Need next 2 bits → 11
+
+Matches c = 11 → ✅ decoded c

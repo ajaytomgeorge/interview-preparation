@@ -1,0 +1,73 @@
+10️⃣ Minimum Number of Arrows to Burst Balloons
+
+Problem
+Intervals represent balloons. One arrow bursts all overlapping balloons.
+
+Greedy choice
+Sort by end coordinate, shoot arrow at end.
+
+
+Python Solution — Greedy Approach
+Idea
+
+Sort balloons by end coordinate
+
+Shoot an arrow at the end of the first balloon
+
+Skip all balloons that this arrow bursts (overlaps with it)
+
+Repeat for remaining balloons
+
+Count the arrows
+
+✅ Why greedy works:
+
+Shooting at the earliest possible end covers as many overlapping balloons as possible
+
+Same principle as earliest finish time in Activity Selection
+
+Implementation
+def find_min_arrows(balloons):
+    if not balloons:
+        return 0
+    
+    # Sort by end coordinate
+    balloons.sort(key=lambda x: x[1])
+    
+    arrows = 1           # Shoot first arrow
+    current_end = balloons[0][1]
+    
+    for start, end in balloons[1:]:
+        if start > current_end:
+            # Need a new arrow
+            arrows += 1
+            current_end = end  # Shoot at end of new balloon
+    
+    return arrows
+
+# Example 1
+balloons = [[10,16],[2,8],[1,6],[7,12]]
+print(find_min_arrows(balloons))  # Output: 2
+
+# Example 2
+balloons = [[1,2],[3,4],[5,6],[7,8]]
+print(find_min_arrows(balloons))  # Output: 4
+
+
+Step-by-step Explanation (Greedy)
+
+Input: [[10,16],[2,8],[1,6],[7,12]]
+
+Sort by end: [[1,6],[2,8],[7,12],[10,16]]
+
+First arrow at 6 → bursts [1,6] and [2,8]
+
+Next balloon [7,12] → start > 6 → new arrow at 12 → bursts [7,12] and [10,16]
+
+Total arrows = 2 ✅
+
+Complexity
+
+Time: O(n log n) → sorting dominates
+
+Space: O(1) → only a few variables

@@ -1,0 +1,101 @@
+Problem
+
+We are given:
+
+A sorted array nums. Example: [1, 1, 2]
+
+Task: Remove duplicates in-place (without using extra array) and return the new length of the array that contains only unique elements.
+
+Constraints / Notes:
+
+The array is sorted, so duplicates appear next to each other.
+
+We can overwrite elements in the array (in-place), but we should not use extra memory for another array.
+
+The return value is the length of the array after removing duplicates.
+
+Step 1: Understand the idea
+
+Because the array is sorted:
+
+Duplicates are consecutive.
+
+So, if nums[i] == nums[i-1], it’s a duplicate.
+
+Otherwise, it’s a new unique element.
+
+We need to shift all unique elements to the front of the array.
+
+Step 2: How the solution works
+def remove_duplicates(nums):
+    if not nums:
+        return 0
+
+
+If the array is empty, return 0.
+
+write_index = 1
+
+
+write_index keeps track of where to write the next unique element.
+
+We start from 1 because the first element is always unique.
+
+for i in range(1, len(nums)):
+    if nums[i] != nums[i-1]:
+        nums[write_index] = nums[i]
+        write_index += 1
+
+
+Iterate through the array from index 1.
+
+Compare current element nums[i] with the previous nums[i-1]:
+
+If they are different, it’s a new unique element.
+
+Write it to nums[write_index] and increment write_index.
+
+If they are same, do nothing (skip it, because it’s a duplicate).
+
+return write_index
+
+
+After the loop, write_index is the number of unique elements.
+
+Step 3: Example walkthrough
+
+Input: [1, 1, 2]
+
+Start with write_index = 1
+
+i	nums[i]	nums[i-1]	Action	nums (after write)
+1	1	1	duplicate, skip	[1, 1, 2]
+2	2	1	new unique, write at index 1	[1, 2, 2]
+
+Increment write_index → now write_index = 2
+
+Return: 2
+
+The first 2 elements [1, 2] are unique.
+
+Step 4: Final array
+nums[:length]  # Output: [1, 2]
+
+
+The rest of the array can be ignored, because we only care about the first length elements.
+
+Step 5: Key points
+
+Two pointers concept:
+
+i → read pointer
+
+write_index → write pointer
+
+Works because the array is sorted, so duplicates are consecutive.
+
+In-place → no extra array needed.
+
+If you want, I can also draw a diagram showing the two pointers moving over the array. It makes this solution very easy to visualize.
+
+Do you want me to make that diagram?

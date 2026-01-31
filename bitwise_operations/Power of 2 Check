@@ -1,0 +1,23 @@
+3️⃣ Power of 2 Check
+
+Observation: A power of 2 has exactly one bit set.
+
+Example:
+
+1 = 0001
+2 = 0010
+4 = 0100
+8 = 1000
+
+
+Trick:
+
+def isPowerOfTwo(n):
+    return n > 0 and (n & (n-1)) == 0
+
+
+Explanation:
+
+n     = 0100
+n-1   = 0011
+n & n-1 = 0 ✅

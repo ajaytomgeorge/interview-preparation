@@ -1,0 +1,166 @@
+3️⃣ Fractional Knapsack
+
+Problem
+Maximize value in a knapsack where fractions of items are allowed.
+
+Greedy choice
+Pick items by highest value-to-weight ratio.
+
+Example
+
+Item   Weight  Value  Ratio
+A       10      60     6
+B       20     100     5
+C       30     120     4
+Capacity = 50
+
+Pick A + B + 2/3 of C
+
+
+✔ Greedy works because fractions are allowed.
+
+Below is a complete, exam-ready explanation of the Fractional Knapsack problem, including intuition, correctness, and Python code.
+
+✅ Fractional Knapsack
+📌 Problem Statement
+
+You are given n items, each with a weight and a value, and a knapsack with a maximum capacity W.
+
+You can take fractions of items
+
+Your goal is to maximize total value in the knapsack
+
+📌 Why This Is Different from 0/1 Knapsack
+Type	Fraction Allowed	Solution
+Fractional Knapsack	✅ Yes	Greedy
+0/1 Knapsack	❌ No	Dynamic Programming
+🧠 Greedy Insight
+
+Since fractions are allowed:
+
+We should always take the item that gives maximum value per unit weight
+
+This ensures we get the best return for each unit of capacity
+
+📌 Greedy Choice:
+
+Pick items in descending order of value-to-weight ratio
+
+📊 Example
+Item	Weight	Value	Ratio
+A	10	60	6
+B	20	100	5
+C	30	120	4
+
+Capacity = 50
+
+🔁 Step-by-Step Selection
+
+Pick A completely
+
+Weight = 10
+
+Value = 60
+
+Remaining capacity = 40
+
+Pick B completely
+
+Weight = 20
+
+Value = 100
+
+Remaining capacity = 20
+
+Pick 2/3 of C
+
+Value = 120 × (20/30) = 80
+
+✅ Total Value
+60 + 100 + 80 = 240
+
+🧠 Why Greedy Works (Key Exam Reason)
+
+Because fractions are allowed, taking the item with the highest value-to-weight ratio always gives the maximum marginal benefit at each step.
+
+This problem satisfies the greedy-choice property and optimal substructure.
+
+🧑‍💻 Python Code (Exam-Ready)
+def fractional_knapsack(items, capacity):
+    """
+    items: list of tuples (value, weight)
+    capacity: maximum weight
+    """
+
+    # Sort items by value-to-weight ratio (descending)
+    items.sort(key=lambda x: x[0] / x[1], reverse=True)
+
+    total_value = 0.0
+
+    for value, weight in items:
+        if capacity == 0:
+            break
+
+        if weight <= capacity:
+            total_value += value
+            capacity -= weight
+        else:
+            # Take fraction
+            fraction = capacity / weight
+            total_value += value * fraction
+            capacity = 0
+
+    return total_value
+
+🧪 Test Example
+items = [(60, 10), (100, 20), (120, 30)]
+capacity = 50
+
+print(fractional_knapsack(items, capacity))
+
+
+Output:
+
+240.0
+
+⏱ Complexity
+Metric	Value
+Time Complexity	O(n log n) (sorting)
+Space Complexity	O(1)
+❌ Why Greedy Fails for 0/1 Knapsack
+
+If fractions are not allowed, greedy can fail:
+
+Example:
+
+Items:
+A (10, 60)
+B (20, 100)
+C (30, 120)
+Capacity = 50
+
+
+Greedy picks A + B = 160
+Optimal is B + C = 220
+
+👉 Hence DP is required for 0/1 Knapsack
+
+📌 Exam Summary (One Page)
+
+Fractional Knapsack → Greedy
+
+Sort by value/weight ratio
+
+Take full items, then fraction
+
+Works because fractions are allowed
+
+Time complexity: O(n log n)
+
+If you want next:
+
+0/1 Knapsack DP solution
+
+Formal proof of greedy correctness
+
+Comparison table (Fractional vs 0/1)

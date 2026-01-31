@@ -1,0 +1,113 @@
+Appraoch 1 - Lazy approach
+import heapq
+from typing import List, Dict
+
+
+FeatureYour shortestPath Code (Lazy)Image Code (Eager)When finding a pathAlways pushes to minHeap.Only pushes if new_dist < current_dist.Handling duplicatesThe heap contains multiple entries for the same node.The heap usually has fewer entries."Better path" logicRelies on the heap order to pop the best one first.Checks dist[v] before adding to the heap.MemoryUses more heap space.Uses more array space (for dist).
+
+class Solution:
+    def shortestPath(self, n: int, edges: List[List[int]], src: int) -> Dict[int, int]:
+        adj = {i: [] for i in range(n)}
+        
+        for u, v, weight in edges:
+            adj[u].append((v, weight))
+        
+        shortest = {}
+        minHeap = [(0, src)]
+        
+        while minHeap:
+            w1, n1 = heapq.heappop(minHeap)
+            if n1 in shortest:
+                continue
+            shortest[n1] = w1
+            
+            for n2, w2 in adj[n1]:
+                if n2 not in shortest:
+                    heapq.heappush(minHeap, (w1 + w2, n2))
+        
+        #for handling island nodes not necessary
+        for i in range(n):
+            if i not in shortest:
+                shortest[i] = -1
+        
+        return shortest
+
+Approch2 - Eager approach
+import heapq
+
+def dijkstra(graph, start, n):
+    # 1. Initialize distances to all nodes as infinity
+    # 'n+1' is used if nodes are labeled 1 to n
+    distances = [float('inf')] * (n + 1)
+    distances[start] = 0
+    
+    # 2. Priority Queue stores (distance, node)
+    # We start with the source node at distance 0
+    pq = [(0, start)]
+    
+    while pq:
+        current_distance, u = heapq.heappop(pq)
+        
+        # 3. If we've already found a shorter path to 'u', ignore this one
+        if current_distance > distances[u]:
+            continue
+            
+        # 4. "Relaxation": Check all neighbors of 'u'
+        for v, weight in graph[u]:
+            distance = current_distance + weight
+            
+            # If the new path to 'v' is shorter, update it
+            if distance < distances[v]:
+                distances[v] = distance
+                heapq.heappush(pq, (distance, v))
+                
+    return distances
+
+
+    . Comparison of "Lazy" vs. "Eager" DijkstraYour code uses the "Lazy" approach. Here is how it compares to the version in the image you uploaded earlier:FeatureYour shortestPath Code (Lazy)Image Code (Eager)When finding a pathAlways pushes to minHeap.Only pushes if new_dist < current_dist.Handling duplicatesThe heap contains multiple entries for the same node.The heap usually has fewer entries."Better path" logicRelies on the heap order to pop the best one first.Checks dist[v] before adding to the heap.MemoryUses more heap space.Uses more array space (for dist).
+
+    then why we do eager approach and track all distances what are its advantages
+
+While the Lazy Approach (the dictionary-based code you shared) is often easier to write, the Eager Approach (using an array of distances and float('inf')) is the standard in high-performance competitive programming and systems.
+
+Here is why the Eager approach is often preferred in professional and competitive contexts:
+
+1. Memory Efficiency
+The Lazy approach can lead to a very "fat" Priority Queue.
+
+Lazy: Every time you find a path that is shorter than your current discovery, you push a new entry into the heap. If a node has many incoming edges, you might end up with hundreds of entries in the heap for a single node.
+
+Eager: You check if new_dist < dist[v] before pushing to the heap. This ensures that the heap only ever contains the most promising paths.
+
+Advantage: In a dense graph with many edges (E), the Lazy approach can use significantly more memory, potentially leading to a Memory Limit Exceeded error.
+
+2. Time Complexity (Heap Operations)
+Heap operations (push/pop) take O(log(heap_size)).
+
+Since the Lazy approach allows the heap to grow much larger than the number of nodes (V), the log factor is actually log(E).
+
+The Eager approach keeps the heap size closer to V, making each push and pop slightly faster because the heap tree is shorter.
+
+3. "Island" and Disconnected Node Handling
+The Eager approach handles unreachable nodes automatically.
+
+Lazy: You have to run a secondary loop at the end to check which nodes from 0 to n−1 never made it into your dictionary and manually set them to -1.
+
+Eager: Because you initialize the array with float('inf') or -1 at the start, the values for unreachable nodes are already set. You don't need the extra cleanup loop.
+
+4. Cache Locality (Performance)
+Arrays (Eager): Computers are extremely fast at accessing contiguous memory (arrays). Accessing dist[5] is a nearly instantaneous hardware operation.
+
+Dictionaries (Lazy): Dictionaries use hash maps. While they are O(1) on average, they involve calculating hash functions and handling potential collisions, which is slower than a direct array index access.
+
+Summary Table
+Feature	Lazy Approach (Dictionary)	Eager Approach (Array + ∞)
+Ease of Writing	Very easy; handles non-integer nodes.	Requires knowing N upfront.
+Heap Size	Can grow up to O(E).	Generally stays closer to O(V).
+Memory	High (many redundant heap entries).	Low (one entry per "better" path found).
+Speed	Slightly slower due to hash map overhead.	Faster due to direct array indexing.
+Best For	Sparse graphs or nodes with string IDs.	Performance-critical or dense graphs.
+Which one should you use?
+If you are doing an interview on a platform like LeetCode and the constraints are small (N≤10,000), your Lazy Approach is perfectly fine and often faster to type. However, if you are solving a problem with massive constraints or very tight time limits, the Eager Approach (like the one in your original image) is the safer bet to avoid "Time Limit Exceeded" results.
+
+Would you like me to show you how to add the "Eager" check to your dictionary code to get the best of both worlds?

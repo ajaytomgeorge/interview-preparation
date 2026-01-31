@@ -1,0 +1,70 @@
+A topological sort(applicable only to Directed Acyclic Graph (DAG) 
+
+An ordering of nodes
+
+Valid only for Directed Acyclic Graphs (DAGs)
+
+Based purely on dependencies
+
+Ignores edge weights completely
+
+
+For every directed edge u → v, u comes before v in the ordering.
+
+
+Short answer
+
+❌ No.
+Topological sort is NOT a shortest path algorithm.
+
+But…
+
+✅ It is used inside a shortest path algorithm (for DAGs).
+The actual DAG shortest path algorithm
+Step-by-step
+
+Topological sort the DAG
+
+Set dist[source] = 0, others = ∞
+
+For each node u in topo order:
+
+For each edge u → v:
+
+dist[v] = min(dist[v], dist[u] + weight(u, v))
+
+
+✔️ Works even with negative weights
+✔️ Runs in O(V + E)
+
+Why topological order makes this work
+
+In a DAG:
+
+Once you process a node in topo order,
+
+No future node can point back to it
+
+So its shortest distance is final
+
+This is similar in spirit to Dijkstra — but without heaps.
+
+Comparison table
+Algorithm	Uses weights	Finds shortest path	Requires DAG
+Topological sort	❌ No	❌ No	✅ Yes
+DAG shortest path	✅ Yes	✅ Yes	✅ Yes
+Dijkstra	✅ Yes	✅ Yes	❌ No
+Bellman–Ford	✅ Yes	✅ Yes	❌ No
+
+
+
+Graph types vs Dijkstra
+Graph Type	Directed	Undirected	Cycles	Negative Edges	Negative Cycles	Dijkstra Applicable?	What to Use
+Simple graph	❌	✅	❌	❌	❌	✅	Dijkstra
+Directed graph	✅	❌	❌	❌	❌	✅	Dijkstra
+Directed graph	✅	❌	✅	❌	❌	✅	Dijkstra
+Undirected graph	❌	✅	✅	❌	❌	✅	Dijkstra
+DAG	✅	❌	❌	❌	❌	⚠️	Dijkstra works, but DAG shortest path is faster
+DAG	✅	❌	❌	✅	❌	❌	Topological shortest path
+Graph with negative edges	✅ / ❌	✅ / ❌	❌	✅	❌	❌	Bellman–Ford
+Graph with negative cycle	✅ / ❌	✅ / ❌	✅	✅	✅	❌	No shortest path exists

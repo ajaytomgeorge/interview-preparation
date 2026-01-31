@@ -1,0 +1,38 @@
+Problem 1: Every element appears twice except one
+
+Example:
+
+nums = [2,3,2,4,4]
+
+
+Goal: Find the single number → 3
+
+Solution (XOR trick):
+
+res = 0
+for n in nums:
+    res ^= n
+return res
+
+
+Explanation:
+
+Start with 0
+
+XOR each number
+
+Pairs cancel out → only the single number remains
+
+Step:
+0 ^ 2 = 2
+2 ^ 3 = 1
+1 ^ 2 = 3
+3 ^ 4 = 7
+7 ^ 4 = 3 ✅
+
+
+Complexity:
+
+Time: O(n)
+
+Space: O(1)

@@ -1,0 +1,212 @@
+SOLID is the "Golden Rulebook" for Object-Oriented Programming. It was popularized by Robert C. Martin ("Uncle Bob") to help developers move away from "Spaghetti Code" and toward code that is easy to maintain, test, and scale.
+
+s = single resposnibility
+o - open to extension closed for modifiacation, eg. dont randomly edit exisitng methods, use things like decorators or extensions to add ne behvaioru, : No, adding new functions to a class does not violate the Open-Closed Principle (OCP)—as long as you aren't changing the behavior of the existing code that others already rely on.
+
+The goal of OCP is to ensure that when requirements change, you can add new functionality without risking "breaking" the parts of the system that are already working.
+l- Liskov subsitution oprinciple
+The Liskov Substitution Principle (LSP) basically says that if you have a parent class and a child class, you should be able to swap the parent for the child without the program breaking or behaving unexpectedly.To ensure a child class definitely implements specific functions (and does so correctly), Python provides a tool called Abstract Base Classes (ABCs).1. Using Abstract Base Classes (ABCs)In Python, you use the abc module to define an "interface." If a child class forgets to implement an @abstractmethod, Python will throw an error the moment you try to create an instance of that child.Pythonfrom abc import ABC, abstractmethod
+
+class Shape(ABC):
+    @abstractmethod
+    def calculate_area(self):
+        """Every child MUST implement this."""
+        pass
+
+class Circle(Shape):
+    def __init__(self, radius):
+        self.radius = radius
+
+    def calculate_area(self):
+        return 3.14 * (self.radius ** 2)
+
+# This would raise a TypeError because it's missing calculate_area:
+# class Square(Shape):
+#     pass
+2. Enforcing the "Contract" (LSP)To follow LSP, it’s not enough to just have the function; the function must also behave the same way. Here is how you keep that "contract":Same Arguments: Don't add required arguments in the child that the parent doesn't have.Same Return Types: If the parent returns a float, the child shouldn't suddenly return a string.Don't Narrow Exceptions: If the parent is expected to handle a certain error, the child shouldn't crash the whole system by throwing something wild and new.3. When to use NotImplementedErrorWhile ABC is the gold standard for enforcement, you might see some developers use the manual approach. This doesn't stop the object from being created, but it crashes at runtime if the method is called.Pythonclass Parent:
+    def must_do(self):
+        raise NotImplementedError("You forgot to implement this in the child class!")
+Pro-tip: Stick with ABC. It catches bugs earlier (at instantiation) rather than later (when the code is actually running).Summary TableFeatureNotImplementedErrorabc.ABC (Recommended)When it failsWhen the method is called.When the object is created.EnforcementLoose.Strict.Best forQuick hacks/prototypes.Production-grade Architecture.
+
+While they both deal with how we design "child" classes or implementations, they solve two different problems:
+
+Liskov Substitution (LSP) is about Behavioral Correctness: Can I swap the parent for the child without the logic breaking?
+
+Interface Segregation (ISP) is about Lean Design: Am I forcing a class to implement functions it doesn't actually use?
+
+1. Liskov Substitution Principle (LSP)
+The Problem: The child class "breaks" the expectations of the parent.
+
+Imagine a parent class Bird. It has a method fly(). If you create a Penguin class that inherits from Bird, but you make fly() throw an error (because penguins can't fly), you have broken LSP. A developer expecting a "Bird" will be surprised when the "Penguin" version crashes their code.
+
+Python
+# VIOLATION OF LSP
+class Bird:
+    def fly(self):
+        print("I am flying!")
+
+class Penguin(Bird):
+    def fly(self):
+        raise Exception("I actually can't fly!") # Surprise! The app crashes.
+2. Interface Segregation Principle (ISP)
+The Problem: The interface is too "fat."
+
+Imagine you have one giant interface called SmartDevice. It has print(), fax(), and scan(). If you buy a simple InkjetPrinter, you are forced to implement fax() and scan() even though the machine can't do them. ISP says you should split that giant interface into three smaller ones.
+
+Python
+# VIOLATION OF ISP (The "Fat" Interface)
+class Machine:
+    def print(self): pass
+    def fax(self): pass
+    def scan(self): pass
+
+class BasicPrinter(Machine):
+    def print(self):
+        print("Printing...")
+        
+    def fax(self):
+        # I don't have a fax! I'm forced to write 'pass' or an error.
+        pass
+
+
+    To see Interface Segregation Principle (ISP) in action, let's look at a common mistake: the "God Interface" (or "Fat Interface").
+
+The Violation (The "Fat" Interface)
+Imagine we are building software for a multi-function office printer. We might be tempted to put all features into one single base class.
+
+Python
+from abc import ABC, abstractmethod
+
+# VIOLATION: This interface is too big.
+class MultiFunctionDevice(ABC):
+    @abstractmethod
+    def print_document(self): pass
+
+    @abstractmethod
+    def scan_document(self): pass
+
+    @abstractmethod
+    def fax_document(self): pass
+
+class OldSchoolPrinter(MultiFunctionDevice):
+    def print_document(self):
+        print("Printing page...")
+
+    def scan_document(self):
+        # This printer CAN'T scan, but we are FORCED to implement it.
+        raise NotImplementedError("This device cannot scan.")
+
+    def fax_document(self):
+        # This printer CAN'T fax either.
+        raise NotImplementedError("This device cannot fax.")
+Why this is bad: The OldSchoolPrinter is now "polluted" with methods it doesn't need. If we change the logic for fax_document in the base class, we might accidentally break the OldSchoolPrinter even though it shouldn't have had that feature to begin with.
+
+The Fix (Interface Segregation)
+Instead of one giant class, we break the features into smaller, specific interfaces. A class should only "sign up" for the behaviors it actually performs.
+
+Python
+from abc import ABC, abstractmethod
+
+# 1. Split into lean, specific interfaces
+class Printer(ABC):
+    @abstractmethod
+    def print_document(self): pass
+
+class Scanner(ABC):
+    @abstractmethod
+    def scan_document(self): pass
+
+class FaxMachine(ABC):
+    @abstractmethod
+    def fax_document(self): pass
+
+# 2. The simple printer only inherits what it needs
+class BasicPrinter(Printer):
+    def print_document(self):
+        print("Printing simple black and white...")
+
+# 3. The fancy office machine can inherit multiple interfaces
+class ModernOfficeMachine(Printer, Scanner, FaxMachine):
+    def print_document(self):
+        print("High-speed printing...")
+
+    def scan_document(self):
+        print("Scanning to PDF...")
+
+    def fax_document(self):
+        print("Sending fax...")
+Why this is better:
+Decoupling: If the FaxMachine logic changes, the BasicPrinter code remains completely untouched and safe.
+
+Clarity: When you look at BasicPrinter, you know exactly what it is capable of just by looking at its inheritance list.
+
+Maintenance: You don't have a bunch of raise NotImplementedError or empty pass functions cluttering your code.
+
+Wit check: It’s like a buffet. The "Fat Interface" forces you to pay for the steak, the lobster, and the salad even if you only wanted a dinner roll. ISP lets you pay only for the roll.
+
+Would you like to see how Dependency Inversion (the 'D' in SOLID) uses these small interfaces to make your code even more flexible?
+
+
+Actually, the D in SOLID stands for Dependency Inversion, but Dependency Injection is the most common way to achieve it. They are like two sides of the same coin.
+
+The goal is simple: High-level modules should not depend on low-level modules. Both should depend on abstractions.
+
+1. The Problem: "Hard-Coding" Your Dependencies
+Imagine you have a NotificationService that is hard-coded to use Gmail. If you ever want to switch to Outlook or SMS, you have to tear apart your code and rewrite it.
+
+Python
+# VIOLATION: NotificationService is "married" to Gmail.
+class GmailClient:
+    def send(self, message):
+        print(f"Sending Gmail: {message}")
+
+class NotificationService:
+    def __init__(self):
+        self.email_client = GmailClient()  # HARD-CODED DEPENDENCY
+
+    def send_alert(self, msg):
+        self.email_client.send(msg)
+The issue: NotificationService (high-level) depends directly on GmailClient (low-level). This makes testing hard and switching providers impossible without editing the service.
+
+2. The Solution: Dependency Inversion (The "D")
+Instead of the service "owning" the creation of the client, we create an Abstractions (like an Interface) that both classes agree on.
+
+Python
+from abc import ABC, abstractmethod
+
+# 1. The Abstraction (The "Interface")
+class MessageSender(ABC):
+    @abstractmethod
+    def send(self, message):
+        pass
+
+# 2. Low-level modules (The Workers)
+class GmailClient(MessageSender):
+    def send(self, message):
+        print(f"Gmail sent: {message}")
+
+class SmsClient(MessageSender):
+    def send(self, message):
+        print(f"SMS sent: {message}")
+
+# 3. High-level module (The Boss)
+class NotificationService:
+    def __init__(self, sender: MessageSender): # DEPENDENCY INJECTION
+        self.sender = sender
+
+    def send_alert(self, msg):
+        self.sender.send(msg)
+3. What just happened?
+We used Dependency Injection to satisfy Dependency Inversion:
+
+Inversion: The NotificationService no longer cares how the message is sent. It just knows it has a MessageSender. The control has "inverted" from the service to the person setting up the system.
+
+Injection: We "inject" the specific tool (GmailClient or SmsClient) into the constructor when we create the service.
+
+Python
+# Now we can swap them out easily!
+gmail_service = NotificationService(GmailClient())
+sms_service = NotificationService(SmsClient())
+
+gmail_service.send_alert("Hello via Email!")
+sms_service.send_alert("Hello via SMS!")

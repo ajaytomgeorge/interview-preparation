@@ -1,0 +1,34 @@
+Think of it this way: the Factory Method produces one product, while the Abstract Factory produces a family of related products.1. The Key DifferenceFactory Method: Focuses on a single product. For example, a ButtonFactory creates different types of buttons (Windows buttons, Mac buttons).Abstract Factory: Focuses on families of objects. For example, a UIFactory creates a button, a checkbox, and a scrollbar that all share the same "theme" (Windows or Mac).2. Factory Method Example (Single Product)You have one "creator" that decides which single class to instantiate.Pythonclass ButtonFactory:
+    def create_button(self, os_type):
+        if os_type == "Windows":
+            return WindowsButton()
+        return MacButton()
+3. Abstract Factory Example (Product Families)This is an "Interface of Factories." It ensures that all the parts of your system match each other.Pythonfrom abc import ABC, abstractmethod
+
+# --- Abstract Products ---
+class Button(ABC):
+    @abstractmethod
+    def click(self): pass
+
+class Checkbox(ABC):
+    @abstractmethod
+    def toggle(self): pass
+
+# --- Abstract Factory ---
+class UIFactory(ABC):
+    @abstractmethod
+    def create_button(self) -> Button: pass
+
+    @abstractmethod
+    def create_checkbox(self) -> Checkbox: pass
+
+# --- Concrete Factory 1 (Windows) ---
+class WindowsFactory(UIFactory):
+    def create_button(self): return WindowsButton()
+    def create_checkbox(self): return WindowsCheckbox()
+
+# --- Concrete Factory 2 (Mac) ---
+class MacFactory(UIFactory):
+    def create_button(self): return MacButton()
+    def create_checkbox(self): return MacCheckbox()
+4. Comparison TableFeatureFactory MethodAbstract FactoryComplexitySimpleHigherFocusHow one thing is created.How multiple related things are created.StructureUses inheritance (subclasses override a method).Uses composition (the factory object is passed in).ChangeEasy to add a new product type.Easy to add a whole new "theme" or family.

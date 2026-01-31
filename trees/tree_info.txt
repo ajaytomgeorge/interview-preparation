@@ -1,0 +1,59 @@
+
+
+---
+
+## 🌳 Tree Types — Operations, Efficiency & Complexity
+
+### 1️⃣ Core Tree Structures
+
+| Tree Type | Subtype | Operations Allowed | Strengths (🙂) / Weaknesses (😬) | Time Complexity (Avg / Worst) | Space |
+|-----------|---------|-------------------|------|------|-------|
+| Binary Tree | — | Insert, Delete, Traverse | Simple 🙂 / No order 😬 | O(n) / O(n) | O(h) |
+| BST | Unbalanced | Search, Insert, Delete | Ordered 🙂 / Can degrade 😬 | O(log n) / O(n) | O(h) |
+| BST | Balanced | Search, Insert, Delete, Rotate | Guaranteed log time 🙂🙂 | O(log n) | O(log n) |
+
+### 2️⃣ Balanced Binary Trees (BST Variants)
+
+| Tree | Insert | Delete | Search | Rotation | Best At | Time (All Ops) | Space |
+|------|--------|--------|--------|----------|---------|---|---|
+| AVL Tree | 🙂🙂 | 🙂🙂 | 🙂🙂🙂 | 🙂🙂🙂 | Fast lookups | O(log n) | O(log n) |
+| Red-Black Tree | 🙂🙂🙂 | 🙂🙂🙂 | 🙂🙂 | 🙂🙂 | Fast updates | O(log n) | O(log n) |
+| Splay Tree | 🙂🙂 | 🙂🙂 | 🙂🙂🙂* | 🙂🙂🙂 | Temporal locality | Amortized O(log n) | O(log n) |
+
+*Worst case O(n), amortized O(log n)
+
+### 3️⃣ Non-Binary Trees
+
+| Tree Type | Children | Operations | Best Use Case | Time Complexity | Space |
+|-----------|----------|-----------|---|---|---|
+| N-ary Tree | N | Insert, Delete, Traverse | Hierarchical data | O(n) | O(h) |
+| Trie Tree | Alphabet-based | Insert, Search, Prefix | String search | O(L) | High 😬 |
+
+L = length of word
+
+### 🔁 Traversal Algorithms (Applies to All Trees)
+
+#### DFS Traversals
+
+| Traversal | Order | Best For | Time | Space |
+|-----------|-------|----------|------|-------|
+| Preorder | Root → Left → Right | Copy tree | O(n) | O(h) |
+| Inorder | Left → Root → Right | Sorted BST output | O(n) | O(h) |
+| Postorder | Left → Right → Root | Deletion | O(n) | O(h) |
+
+#### BFS Traversal
+
+| Traversal | Order | Data Structure | Best For | Time | Space |
+|-----------|-------|--------|----------|------|-------|
+| Level Order (BFS) | Level-by-level | Queue | Shortest path | O(n) | O(n) |
+
+### 🧠 Ultra-Short Revision Table
+
+| Tree | Ordered | Balanced | Fast Search | String Friendly |
+|------|---------|----------|-------------|-----------------|
+| Binary Tree | ❌ | ❌ | ❌ | ❌ |
+| BST | ✅ | ❌ | 😬 | ❌ |
+| AVL | ✅ | ✅ | 🙂🙂🙂 | ❌ |
+| Red-Black | ✅ | ✅ | 🙂🙂 | ❌ |
+| Splay | ✅ | Self | 🙂🙂🙂* | ❌ |
+| Trie | ❌ | N/A | 🙂🙂🙂 | ✅ |

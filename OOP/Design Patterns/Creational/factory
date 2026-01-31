@@ -1,0 +1,52 @@
+The Factory Pattern is a creational design pattern that provides an interface for creating objects but allows subclasses or a "factory" class to alter the type of objects that will be created.
+
+In simple terms: instead of calling Class() directly (which is like going to a construction site and building a car yourself), you call a Factory (which is like going to a dealership and saying, "I want a truck").
+
+1. The Problem: Tight Coupling
+If you hard-code object creation using if/else logic throughout your app, adding a new type of object requires you to hunt down and change every single piece of code.
+
+Python
+# WITHOUT A FACTORY
+def get_transport(type):
+    if type == "truck":
+        return Truck()
+    elif type == "ship":
+        return Ship()
+    # If we add 'Plane', we have to find this function and change it.
+2. The Solution: Simple Factory
+In Python, we use a dedicated class or method to handle the "creation logic."
+
+Python
+from abc import ABC, abstractmethod
+
+# 1. The Product Interface
+class Transport(ABC):
+    @abstractmethod
+    def deliver(self): pass
+
+# 2. Concrete Products
+class Truck(Transport):
+    def deliver(self): return "Delivering by land in a crate."
+
+class Ship(Transport):
+    def deliver(self): return "Delivering by sea in a container."
+
+# 3. The Factory
+class TransportFactory:
+    @staticmethod
+    def create_transport(mode):
+        if mode == "land":
+            return Truck()
+        if mode == "sea":
+            return Ship()
+        raise ValueError("Unknown transport mode")
+
+# 4. Usage
+my_delivery = TransportFactory.create_transport("land")
+print(my_delivery.deliver())
+3. Why use the Factory Pattern?
+Decoupling: The "User" of the object doesn't need to know how the object is built or even the name of the specific class. They only care about the interface (deliver).
+
+Single Responsibility Principle (SRP): You move all the creation logic into one place.
+
+Open/Closed Principle (OCP): You can add new transport types (like Plane) by adding a new class and updating the factory, without touching the main business logic.

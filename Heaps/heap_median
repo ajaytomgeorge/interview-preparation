@@ -1,0 +1,74 @@
+📌 Question: Find Median from Data Stream
+🔹 Problem
+
+Design a data structure that supports:
+
+addNum(num) → add a number
+
+findMedian() → return the median of all numbers so far
+
+Median:
+
+Odd count → middle element
+
+Even count → average of two middle elements
+
+💡 Key Idea
+
+Use two heaps to split the data into two halves.
+
+Heaps Used
+
+Max-heap (left) → smaller half
+
+Min-heap (right) → larger half
+
+Invariants
+
+max(left) ≤ min(right)
+
+|size(left) − size(right)| ≤ 1
+
+🧠 Median Logic
+
+If one heap is larger → median is its top
+
+If both heaps same size → average of both tops
+
+⏱ Complexity
+
+Insert: O(log N)
+
+Find median: O(1)
+
+Space: O(N)
+
+🧩 Python Code (Exam Version)
+import heapq
+
+class MedianFinder:
+    def __init__(self):
+        self.left = []   # max heap (negative values)
+        self.right = []  # min heap
+
+    def addNum(self, num):
+        heapq.heappush(self.left, -num)
+
+        if self.right and -self.left[0] > self.right[0]:
+            heapq.heappush(self.right, -heapq.heappop(self.left))
+
+        if len(self.left) > len(self.right) + 1:
+            heapq.heappush(self.right, -heapq.heappop(self.left))
+        elif len(self.right) > len(self.left):
+            heapq.heappush(self.left, -heapq.heappop(self.right))
+
+    def findMedian(self):
+        if len(self.left) > len(self.right):
+            return -self.left[0]
+        return (-self.left[0] + self.right[0]) / 2
+
+🎯 One-Line Exam Explanation
+
+“We maintain a max-heap for the lower half and a min-heap for the upper half, balance their sizes, and compute the median from their top elements.”
+
+If you want, I can:

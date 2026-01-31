@@ -1,0 +1,109 @@
+Yes 👍 — and this is a great instinct, because context switching is usually taught abstractly but understood best with code.
+
+Below are two exam-friendly code samples that show context switching clearly:
+
+1️⃣ User-level (software) context switching → cooperative
+2️⃣ OS-level context switching → preemptive
+
+I’ll also explain what exactly is being switched in each case.
+
+1️⃣ USER-LEVEL CONTEXT SWITCHING (COOPERATIVE)
+
+👉 Best for understanding the concept
+👉 Happens without OS scheduler
+👉 Implemented using generators (coroutines)
+
+✅ Python Example (Manual Context Switching)
+def task1():
+    for i in range(3):
+        print("Task 1 running")
+        yield   # context switch point
+
+def task2():
+    for i in range(3):
+        print("Task 2 running")
+        yield   # context switch point
+
+t1 = task1()
+t2 = task2()
+
+while True:
+    try:
+        next(t1)   # switch to task1
+        next(t2)   # switch to task2
+    except StopIteration:
+        break
+
+Output
+Task 1 running
+Task 2 running
+Task 1 running
+Task 2 running
+Task 1 running
+Task 2 running
+
+🧠 What is being context-switched here?
+
+Saved per task:
+
+Instruction pointer (where execution paused)
+
+Local variables
+
+Call stack
+
+📌 NO OS involvement
+📌 This is how green threads / async runtimes work
+
+📝 Exam Line
+
+User-level context switching is cooperative and occurs when a task explicitly yields control.
+
+2️⃣ OS-LEVEL CONTEXT SWITCHING (PREEMPTIVE)
+
+👉 Real Linux context switching
+👉 Controlled by kernel scheduler
+
+✅ Python Example (Threads)
+import threading
+import time
+
+def task(name):
+    for i in range(3):
+        print(f"{name} running")
+        time.sleep(1)   # forces context switch
+
+t1 = threading.Thread(target=task, args=("Thread-1",))
+t2 = threading.Thread(target=task, args=("Thread-2",))
+
+t1.start()
+t2.start()
+
+t1.join()
+t2.join()
+
+Possible Output
+Thread-1 running
+Thread-2 running
+Thread-1 running
+Thread-2 running
+...
+
+🧠 What is being context-switched here?
+
+Saved by OS:
+
+CPU registers
+
+Program Counter
+
+Stack pointer
+
+Thread state
+
+📌 OS decides when to switch
+📌 Happens via timer interrupt
+
+📝 Exam Line
+
+OS-level context switching is preemptive and managed by the kernel scheduler.

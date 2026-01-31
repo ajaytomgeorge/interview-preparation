@@ -1,0 +1,73 @@
+✅ Approach 2: Two Pointers (O(N log N) time)
+
+Idea:
+
+Sort the array
+
+Use two pointers: left at start, right at end
+
+If sum < target → move left pointer
+
+If sum > target → move right pointer
+
+If sum == target → return answer
+
+Important:
+
+Sorting changes indices, so often used when values are needed, not original indices
+
+Python Code:
+
+def twoSumTwoPointers(nums, target):
+    nums_with_idx = list(enumerate(nums))  # keep original indices
+    nums_with_idx.sort(key=lambda x: x[1])
+    left, right = 0, len(nums)-1
+
+    while left < right:
+        total = nums_with_idx[left][1] + nums_with_idx[right][1]
+        if total == target:
+            return [nums_with_idx[left][0], nums_with_idx[right][0]]
+        elif total < target:
+            left += 1
+        else:
+            right -= 1
+    return []
+
+
+Time: O(N log N) due to sorting, Space: O(N)
+
+🔹 Key Differences
+Approach	Time	Space	Notes
+Hashmap	O(N)	O(N)	Works on unsorted array, fast
+Two Pointers	O(N log N)	O(N)	Requires sorting, keeps original indices with extra work
+
+
+
+Hasmap appaoach
+✅ Approach 1: Using Hashmap (O(N) time)
+
+Idea:
+
+Store each number and its index in a hashmap while iterating
+
+For each number num, check if target - num exists in the map
+
+Python Code:
+
+def twoSumHashmap(nums, target):
+    seen = {}  # num -> index
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in seen:
+            return [seen[complement], i]  # indices of the two numbers
+        seen[num] = i
+    return []
+
+
+Example:
+
+nums = [2,7,11,15], target = 9
+Output: [0,1]  # because 2 + 7 = 9
+
+
+Time: O(N), Space: O(N)

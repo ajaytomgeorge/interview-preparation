@@ -1,0 +1,393 @@
+Perfect 👍 — here is a clean, exam-ready set of notes + minimal code samples for all three: Mutex, Semaphore, Monitor.
+This is written exactly in the style you can revise the night before an exam or interview.
+
+🧠 CONCURRENCY PRIMITIVES — EXAM READY NOTES
+1️⃣ MUTEX (Mutual Exclusion)
+📌 Definition (EXAM LINE)
+
+A mutex allows only one thread/process to enter a critical section at a time.
+
+✅ What problem it solves
+
+Race condition
+
+Concurrent modification of shared data
+
+❌ What it does NOT do
+
+Does not manage ordering
+
+Does not count resources
+
+🧠 Key Rules
+
+Lock before accessing shared data
+
+Unlock immediately after
+
+Only the owner can unlock
+
+⏱️ Complexity
+
+Lock / Unlock: O(1)
+
+Space: O(1)
+
+✅ Python Code (Minimal & Exam-Perfect)
+import threading
+
+counter = 0
+lock = threading.Lock()
+
+def worker():
+    global counter
+    for _ in range(100000):
+        with lock:      # mutex
+            counter += 1
+
+t1 = threading.Thread(target=worker)
+t2 = threading.Thread(target=worker)
+
+t1.start()
+t2.start()
+t1.join()
+t2.join()
+
+print(counter)
+
+📝 Exam Keywords
+
+critical section, mutual exclusion, race condition, ownership
+
+2️⃣ SEMAPHORE
+📌 Definition (EXAM LINE)
+
+A semaphore controls access to a resource by maintaining a counter.
+
+✅ What problem it solves
+
+Limited resources (DB connections, buffer slots)
+
+Producer–Consumer synchronization
+
+❌ What it does NOT guarantee
+
+Mutual exclusion (unless semaphore = 1)
+
+Ownership (any thread can release)
+
+🧠 Types
+
+Binary semaphore → like mutex
+
+Counting semaphore → N resources
+
+⏱️ Complexity
+
+Acquire / Release: O(1)
+
+Space: O(1)
+
+✅ Python Code (Counting Semaphore)
+import threading
+import time
+
+sem = threading.Semaphore(2)
+
+def worker(i):
+    sem.acquire()
+    print(f"Worker {i} ENTER")
+    time.sleep(2)
+    print(f"Worker {i} EXIT")
+    sem.release()
+
+for i in range(5):
+    threading.Thread(target=worker, args=(i,)).start()
+
+🧠 Semaphore = Tickets 🎟️
+
+Acquire → take a ticket
+
+Release → return a ticket
+
+📝 Exam Keywords
+
+counting, resource control, blocking, producer-consumer
+
+3️⃣ MONITOR (Mutex + Condition Variable)
+📌 Definition (EXAM LINE)
+
+A monitor is a synchronization construct that allows threads to wait until a condition becomes true, using a mutex and condition variable.
+
+✅ What problem it solves
+
+Waiting for state change
+
+Thread coordination without busy waiting
+
+🧠 Components
+
+Shared state
+
+Mutex
+
+Condition variable
+
+🚨 Critical Rule (VERY IMPORTANT)
+
+wait() releases the lock and sleeps, then re-acquires it when notified.
+
+⏱️ Complexity
+
+Wait / Notify: O(1)
+
+Space: O(1)
+
+✅ Python Code (Correct Monitor Pattern)
+import threading
+import time
+
+lock = threading.Lock()
+condition = threading.Condition(lock)
+ready = False
+
+def worker():
+    global ready
+    with condition:
+        while not ready:        # MUST be while
+            condition.wait()
+        print("Worker running")
+
+def controller():
+    global ready
+    time.sleep(2)
+    with condition:
+        ready = True
+        condition.notify()
+
+threading.Thread(target=worker).start()
+threading.Thread(target=controller).start()
+
+🧠 Why while and not if?
+
+Spurious wakeups
+
+Multiple waiting threads
+
+POSIX requirement
+
+📝 Exam Keywords
+
+condition variable, wait queue, signal, monitor pattern
+
+🔥 COMPARISON TABLE (EXAM GOLD)
+Feature	Mutex	Semaphore	Monitor
+Controls	Access	Count	State
+Ownership	Yes	No	Yes
+Blocks threads	Yes	Yes	Yes
+Busy waiting	No	No	No
+Typical use	Protect data	Limit resources	Wait for condition
+🔗 Linux / POSIX Mapping (VERY IMPRESSIVE IN EXAMS)
+Concept	Python	POSIX
+Mutex	Lock()	pthread_mutex_t
+Semaphore	Semaphore()	sem_t
+Monitor	Condition()	pthread_cond_t
+🧠 ONE-LINE MEMORY TRICK (EXAM SAVER)
+
+Mutex → Who can enter? 🔒
+
+Semaphore → How many can enter? 🎟️
+
+Monitor → When can I enter? ⏳
+
+
+🧠 Threads in a Process vs Threads in a CPU
+1️⃣ Threads in a Process (Software / OS concept)
+📌 Definition (EXAM LINE)
+
+A thread in a process is the smallest unit of execution scheduled by the OS, sharing the same address space and resources of the process.
+
+What process threads share
+
+Same virtual memory (heap, global variables)
+
+Same file descriptors
+
+Same code segment
+
+What each thread has separately
+
+Program Counter (PC)
+
+Registers
+
+Stack
+
+Thread ID
+
+Example (Linux process)
+Process (PID)
+├── Thread 1 (main)
+├── Thread 2 (worker)
+└── Thread 3 (logger)
+
+
+📌 Context switch between threads is cheap
+
+Why processes use threads
+
+Parallel tasks (I/O + compute)
+
+Better performance than processes
+
+Shared data without IPC
+
+2️⃣ Threads in a CPU (Hardware concept)
+📌 Definition (EXAM LINE)
+
+A CPU thread (hardware thread) is a physical execution context inside a CPU core, enabled by Simultaneous Multithreading (SMT).
+
+Examples
+
+Intel Hyper-Threading
+
+AMD SMT
+
+1 CPU
+└── 4 Cores
+    └── 2 Threads per core
+        = 8 CPU threads
+
+
+📌 These are also called:
+
+Logical cores
+
+Hardware threads
+
+What CPU threads share
+
+Execution units
+
+Cache (L1/L2 partially)
+
+Core resources
+
+What they duplicate
+
+Registers
+
+Instruction pointers
+
+3️⃣ KEY DIFFERENCE (CORE IDEA)
+
+Process threads are scheduled ONTO CPU threads
+
+4️⃣ Mapping: Software → Hardware
+Process Threads (Software)
+        ↓ scheduled by OS
+CPU Threads (Hardware)
+        ↓ run on
+CPU Cores
+
+5️⃣ Scheduling Example
+
+System:
+
+4 CPU cores
+2 threads per core
+= 8 CPU threads
+
+
+Process:
+
+10 software threads
+
+
+What happens?
+
+OS schedules 8 threads immediately
+
+2 threads WAIT (run later)
+
+📌 OS scheduler decides which software thread runs on which CPU thread
+
+6️⃣ Context Switching
+Software Thread Context Switch
+
+Save registers
+
+Switch stack
+
+Switch PC
+✅ Fast
+
+Process Context Switch
+
+Switch address space
+
+TLB flush
+❌ Expensive
+
+Hardware Thread Switch
+
+Happens in silicon
+
+Near zero cost
+⚡ Very fast
+
+7️⃣ Comparison Table (EXAM GOLD)
+Aspect	Process Thread	CPU Thread
+Type	Software	Hardware
+Managed by	OS	CPU
+Shares memory	Yes (within process)	Yes (within core)
+Has stack	Yes	Yes
+Context switch	Cheap	Very cheap
+Visible to OS	Yes	Yes
+Created by	pthread_create()	CPU design
+8️⃣ Common Exam Traps 🚨
+❌ Wrong
+
+“CPU threads and process threads are the same”
+
+✅ Correct
+
+“Process threads are mapped onto CPU threads by the OS”
+
+❌ Wrong
+
+“More threads always means faster”
+
+✅ Correct
+
+“Performance depends on CPU threads, workload, and contention”
+
+9️⃣ Real Linux Commands (Nice to Mention)
+lscpu
+
+
+Shows:
+
+Cores per socket
+
+Threads per core
+
+top
+htop
+
+
+Shows:
+
+Software threads running on CPU threads
+
+🧠 One-Line Memory Trick
+
+Process threads → what you write 🧑‍💻
+
+CPU threads → what actually runs ⚙️
+
+🎯 Final Exam Answer (Perfect 3-line Version)
+
+Threads in a process are software execution units sharing the same address space, managed by the OS scheduler.
+CPU threads are hardware execution contexts within CPU cores that allow parallel execution.
+The OS schedules process threads onto available CPU threads for execution.

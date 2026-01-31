@@ -1,0 +1,231 @@
+8️⃣ Gas Station (Circular Tour)
+
+Problem
+Given gas and cost at stations, find starting point to complete a circle.
+
+Greedy insight
+
+If total gas < total cost → impossible
+
+Reset start when balance becomes negative
+
+Key idea
+Local failure means no earlier station could work.
+
+Absolutely! Let’s break the Gas Station (Circular Tour) problem down in a clear, visual, intuitive way, so it makes perfect sense for exams or interviews.
+
+1️⃣ Problem Story Version
+
+Imagine:
+
+You have a circular track with n gas stations.
+
+Each station i has:
+
+gas[i] → amount of gas you can fill at that station
+
+cost[i] → amount of gas needed to drive to the next station (i+1) % n
+
+You have a car with unlimited tank, but it starts empty.
+
+Question:
+
+From which station can you start so that you can drive all the way around the circle and return to the starting station?
+
+If it’s impossible, return -1.
+
+2️⃣ Key Observations
+Observation 1: Feasibility
+
+Total gas must be at least total cost, otherwise you cannot complete the circle:
+
+if 
+∑
+𝑔
+𝑎
+𝑠
+[
+𝑖
+]
+<
+∑
+𝑐
+𝑜
+𝑠
+𝑡
+[
+𝑖
+]
+  
+⟹
+  
+impossible
+if ∑gas[i]<∑cost[i]⟹impossible
+Observation 2: Local Failure Means Reset
+
+Keep track of tank = gas gained - cost spent so far.
+
+If tank ever becomes negative at station i:
+
+You cannot start from any station before i+1, because the tank would always run out before i+1.
+
+So reset start to i+1 and tank = 0.
+
+3️⃣ Intuition With Example
+gas  = [1, 2, 3, 4, 5]
+cost = [3, 4, 5, 1, 2]
+
+
+Step by step:
+
+Station	gas[i]-cost[i]	tank	action
+0	1-3 = -2	-2	tank<0 → reset start=1, tank=0
+1	2-4 = -2	-2	tank<0 → reset start=2, tank=0
+2	3-5 = -2	-2	tank<0 → reset start=3, tank=0
+3	4-1 = 3	3	continue
+4	5-2 = 3	6	continue
+
+✅ Start at station 3, tank stays positive, complete circle.
+
+4️⃣ Visual Intuition
+Circle: 0 → 1 → 2 → 3 → 4 → 0
+
+Tank after each station if starting at station 0:
+0: tank=-2 (fail)
+1: tank=-2 (fail)
+2: tank=-2 (fail)
+3: tank=3 → works
+4: tank=6 → works
+
+
+The local deficit at 0,1,2 guarantees none of them can be starting points.
+
+Only station 3 succeeds.
+
+5️⃣ Why Greedy Works
+
+If total gas ≥ total cost, a solution always exists.
+
+Resetting start at the first station where tank < 0 is safe, because:
+
+Any station before the failure would run out of gas before reaching station i+1
+
+No need to consider them
+
+The algorithm is O(n) — we just scan the stations once.
+
+6️⃣ Key Takeaways for Exams
+
+Check feasibility: sum(gas) < sum(cost) → impossible
+
+Scan stations once: maintain tank
+
+Reset start when tank < 0
+
+Return start at the end (if feasible)
+
+If you want, I can also draw a small diagram showing the circle, tank levels, and reset points — this makes the greedy insight instantly clear for interviews.
+
+Do you want me to do that?
+
+what does next station (i+1) % n mean
+
+Ah! That’s a key detail. Let me explain clearly.
+
+What (i+1) % n Means
+
+We’re dealing with a circular track of n gas stations, numbered:
+
+0, 1, 2, ..., n-1
+
+
+After the last station n-1, the next station is station 0.
+
+That’s why we use modulo (%) arithmetic:
+
+next station
+=
+(
+𝑖
++
+1
+)
+%
+𝑛
+next station=(i+1)%n
+Example:
+
+If n = 5 stations (0 to 4):
+
+i	(i + 1)	(i + 1) % n	Next station
+0	1	1	1
+1	2	2	2
+2	3	3	3
+3	4	4	4
+4	5	0	0 → back to start
+Why We Need It
+
+The % n ensures that after the last station, we wrap around to the first station.
+
+Without it, i+1 would go out of bounds when i = n-1.
+
+This is what makes the track circular.
+
+In Code
+next_station = (i + 1) % n
+
+
+If i = 4 and n = 5 → (4 + 1) % 5 = 0
+
+Meaning after station 4, the next station is station 0
+
+Visual
+Station 0 → Station 1 → Station 2 → Station 3 → Station 4
+         ^                                 |
+         |---------------------------------|
+
+
+% n handles the wrap-around arrow from last station back to first.
+
+💡 Tip for Interviews:
+
+Always mention that % n is used to simulate circular arrays.
+
+It avoids index out-of-bounds and correctly models the “circle” in the problem.
+
+If you want, I can now draw a full diagram showing gas levels, tank, and wrap-around using (i+1)%n, so you can see the circular tour visually.
+
+Do you want me to do that?
+
+
+solution
+Python Solution — Greedy Approach
+def can_complete_circuit(gas, cost):
+    """
+    Find the starting gas station index to complete the circular tour.
+    Return -1 if impossible.
+    """
+    n = len(gas)
+    
+    total_gas = 0   # Total net gas over all stations
+    tank = 0        # Current tank during traversal
+    start = 0       # Candidate starting station
+    
+    for i in range(n):
+        tank += gas[i] - cost[i]
+        total_gas += gas[i] - cost[i]
+        
+        if tank < 0:
+            # Cannot reach station i+1 from current start
+            start = i + 1   # Reset starting point
+            tank = 0        # Reset tank for new start
+    
+    # If total gas < total cost → impossible
+    return start if total_gas >= 0 else -1
+
+# -----------------------------
+# Example Usage
+gas  = [1, 2, 3, 4, 5]
+cost = [3, 4, 5, 1, 2]
+
+print(can_complete_circuit(gas, cost))  # Output: 3
